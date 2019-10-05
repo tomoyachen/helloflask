@@ -1,7 +1,8 @@
 from flask import Flask
+from flask_foo import Foo
 
 app = Flask(__name__)
-
+foo = Foo(app)
 
 @app.route('/')
 def index():
