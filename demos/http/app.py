@@ -218,3 +218,6 @@ def redirect_back(default='hello', **kwargs):
         if is_safe_url(target):
             return redirect(target)
     return redirect(url_for(default, **kwargs))
+
+if __name__ == "__main__":
+    app.run()
