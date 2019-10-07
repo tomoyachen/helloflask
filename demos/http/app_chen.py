@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, url_for, redirect, abort, make_response, jsonify
+from flask import Flask, request, url_for, redirect, abort, make_response, jsonify, session, escape
 import json
+import os
 
 
 app = Flask(__name__)
 
-@app.route('/hello', methods=["GET","POST"])
-def hello():
-    name = request.args.get('name', None)    # 获取查询参数name的值
-    if name is None:
-        name = request.cookies.get("name", None) # 从Cookie中取值
-        if name is None:
-            return abort(500)
-    return '<h1>Hello, %s!</h1>' % name     # 插入到返回值中
+# @app.route('/hello', methods=["GET","POST"])
+# def hello():
+#     name = request.args.get('name', None)    # 获取查询参数name的值
+#     if name is None:
+#         name = request.cookies.get("name", None) # 从Cookie中取值
+#         if name is None:
+#             return abort(500)
+#     return '<h1>Hello, %s!</h1>' % name     # 插入到返回值中
 
 @app.route('/go_back/<int:year>')
 def go_back(year):
@@ -118,6 +119,39 @@ def set_cookie(name):
     response = make_response(redirect(url_for("hello")))
     response.set_cookie("name", name)
     return response
+
+
+app.secret_key = os.getenv("SECRET_KEY", "")
+
+@app.route('/login')
+def login():
+    session['logged_in'] = True # 向session中添加了一个名为"logged_in"的cookie
+    session['username'] = "Admin"
+    return redirect(url_for('hello'))
+
+@app.route('/')
+@app.route('/hello')
+def hello():
+    name = request.args.get('name')
+    if name is None:
+        name = request.cookies.get('name', 'Human')
+    response = '<h1>Hello, %s!</h1>' % escape(name)  # escape name to avoid XSS
+    # return different response according to the user's authentication status
+    #验证是否存在
+    if 'logged_in' in session:
+        response += '[Authenticated]'
+    else:
+        response += '[Not Authenticated]'
+    #验证session的指定key的值
+    if session.get("username") == name:
+        response += '<h1>管理员</h1>'
+    else:
+        response += "<h1>用户</h1>"
+
+    return response
+
+
+
 
 #钩子
 @app.before_request
