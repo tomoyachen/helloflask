@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, url_for, redirect, abort, make_response, jsonify, session, escape
+from flask import Flask, request, url_for, redirect, abort, make_response, jsonify, session, escape, g
 import json
 import os
 
@@ -61,8 +61,8 @@ def not_found():
     abort(404)
 
 
-@app.route('/foo')
-def foo():
+@app.route('/foo1')
+def foo1():
     response = make_response("""<!DOCTYPE html>
         <html>
         <head></head>
@@ -127,6 +127,9 @@ app.secret_key = os.getenv("SECRET_KEY", "")
 def login():
     session['logged_in'] = True # 向session中添加了一个名为"logged_in"的cookie
     session['username'] = "Admin"
+    session.permanent = True #默认31天
+    app.permanent_session_lifetime  = 1
+    # 等效于 配置环境变量 PERMANENT_SESSION_LIFETIME
     return redirect(url_for('hello'))
 
 @app.route('/')
@@ -151,6 +154,38 @@ def hello():
     return response
 
 
+@app.route('/admin')
+def admin():
+    print (g.name)
+    if "logged_in" not in session:
+        abort(403)
+    return "Welcome to admin page."
+
+
+@app.route("/logout")
+def logout():
+    if "logged_in" in session:
+        session.pop("logged_in")
+    return redirect(url_for("hello"))
+
+
+@app.route('/foo')
+def foo():
+    return '<h1>Foo page</h1><a href="%s">Do something</a>' % url_for('do_something')
+
+@app.route('/bar')
+def bar():
+    return '<h1>Bar page</h1><a href="%s">Do something </a>' % url_for('do_something', next=request.full_path)
+
+@app.route('/do-something')
+def do_something():
+    # do something
+    # return redirect(request.referrer) #请求头里的referer参数，自动记录上一个页面URL
+    # return redirect(request.referrer or url_for("hello")) #获取请求头里的referer参数 + 缺省值
+    # return redirect(request.args.get("next", url_for("hello"))) #获取URL里的next参数 + 缺省值
+    return redirect(request.args.get("next") or request.referrer or url_for("hello")) #结合referer + next + redirect函数的缺省值
+
+
 
 
 #钩子
@@ -159,6 +194,34 @@ def do_something():
     # 这里的代码会在每个请求处理前执行
     print ("我做了某事，在请求前！")
 
+
+#当前请求中的全局变量，每次请求都会重设
+@app.before_request
+def get_name():
+    g.name = request.args.get('name')
+
+
+# from flask import current_app
+
+# #手动激活程序上下文
+# with app.app_context():
+#     print(current_app.name)
+#
+# #手动激活程序上下文 push方法
+# app_ctx = app.app_context()
+# app_ctx.push() #推送
+# print(current_app.name)
+# app_ctx.pop() #销毁
+#
+# #手动激活请求上下文
+# with app.test_request_context('/hello'):
+#     print(request.method)
+#
+# #手动激活请求上下文 push方法
+# app_req_ctx = app.test_request_context('/hello')
+# app_req_ctx.push()
+# print(request.method)
+# app_req_ctx.pop()
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
