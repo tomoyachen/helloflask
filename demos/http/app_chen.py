@@ -3,6 +3,8 @@
 from flask import Flask, request, url_for, redirect, abort, make_response, jsonify, session, escape, g
 import json
 import os
+from urllib.parse import urlparse, urljoin
+from jinja2.utils import generate_lorem_ipsum
 
 
 app = Flask(__name__)
@@ -166,6 +168,8 @@ def logout():
 
 @app.route('/foo')
 def foo():
+    print(is_safe_url("http://www.baidu.com/aaa/111"))
+    print(is_safe_url("http://127.0.0.1/bbb"))
     return '<h1>Foo page</h1><a href="%s">Do something</a>' % url_for('do_something')
 
 @app.route('/bar')
@@ -178,10 +182,55 @@ def do_something():
     # return redirect(request.referrer) #请求头里的referer参数，自动记录上一个页面URL
     # return redirect(request.referrer or url_for("hello")) #获取请求头里的referer参数 + 缺省值
     # return redirect(request.args.get("next", url_for("hello"))) #获取URL里的next参数 + 缺省值
-    return redirect(request.args.get("next") or request.referrer or url_for("hello")) #结合referer + next + redirect函数的缺省值
+    return redirect_back()
 
 
+def redirect_back(default='hello', **kwargs):
+    for target in request.args.get('next'), request.referrer:
+        if not target:
+            continue
+        if is_safe_url(target):
+            return redirect(target)
+    return redirect(url_for(default, **kwargs))
 
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    print("request.host_url", request.host_url)
+    print("ref_url", ref_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    print("urljoin(request.host_url, target)", urljoin(request.host_url, target))
+    print("test_url", test_url)
+    return test_url.scheme in ('http', 'https') and \
+           ref_url.netloc == test_url.netloc
+
+
+# AJAX
+@app.route('/post')
+def show_post():
+    post_body = generate_lorem_ipsum(n=2)
+    return '''
+<h1>A very long post</h1>
+<div class="body">%s</div>
+<button id="load">Load More</button>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+$(function() {
+    $('#load').click(function() {
+        $.ajax({
+            url: '/more',
+            type: 'get',
+            success: function(data){
+                $('.body').append(data);
+            }
+        })
+    })
+})
+</script>''' % post_body
+
+
+@app.route('/more')
+def load_post():
+    return generate_lorem_ipsum(n=1)
 
 #钩子
 @app.before_request

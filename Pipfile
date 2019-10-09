@@ -22,4 +22,4 @@ redis = "*"
 flask-dropzone = "*"
 flask-wtf = "*"
 flask-ckeditor = "*"
-
+urlparse = "*"
