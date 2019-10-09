@@ -25,11 +25,6 @@ def three_colors(color):
     return "<p>Color is %s.</p>" % color
 
 
-
-
-
-
-
 @app.route('/hello2')
 def hello2():
     return '<h1>Hello2, Flask!</h1>'
@@ -128,7 +123,7 @@ def login():
     session['logged_in'] = True # 向session中添加了一个名为"logged_in"的cookie
     session['username'] = "Admin"
     session.permanent = True #默认31天
-    app.permanent_session_lifetime  = 1
+    app.permanent_session_lifetime  = 3600 * 24
     # 等效于 配置环境变量 PERMANENT_SESSION_LIFETIME
     return redirect(url_for('hello'))
 
@@ -224,4 +219,4 @@ def get_name():
 # app_req_ctx.pop()
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
