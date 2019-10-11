@@ -8,6 +8,9 @@ def hello():
 
 
 def a():
+    a = 1
+    b = 2
+    c = 1+2
     pass
 
 if __name__ == "__main__":
