@@ -7,6 +7,9 @@ def hello():
     return "Welcome to My Watchlist!"
 
 
+def a():
+    pass
+
 if __name__ == "__main__":
     app.run()
 
