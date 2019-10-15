@@ -44,7 +44,8 @@ def test_url_for():
 def index():
     user = User.query.first()
     movies = Movie.query.all()
-    return render_template("index.html", user = user.name, movies = movies)
+    # return render_template("index.html", user = user, movies = movies)
+    return render_template("index.html", movies = movies) #用了context_processor装饰器，省略name
 
 
 @app.route("/addMovie")
@@ -60,6 +61,8 @@ def deleteMovie():
     db.session.delete(movie)
     db.session.commit()
     return "0x000000"
+
+
 
 class User(db.Model):  # 表名将会是 user（自动生成，小写处理）
     id = db.Column(db.Integer, primary_key=True)  # 主键
@@ -109,6 +112,16 @@ def forge():
     db.session.commit()
     click.echo('Done.')
 
+@app.errorhandler(404)  # 传入要处理的错误代码
+def page_not_found(e):  # 接受异常对象作为参数
+    user = User.query.first()
+    # return render_template('404.html', user=user), 404  # 返回模板和状态码
+    return render_template('404.html'), 404 #用了context_processor装饰器，省略name
+
+@app.context_processor
+def inject_user():  # 函数名可以随意修改
+    user = User.query.first()
+    return dict(user=user)  # 需要返回字典，等同于return {'user': user}
 
 if __name__ == "__main__":
     app.run()

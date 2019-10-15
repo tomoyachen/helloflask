@@ -1,12 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>{{ user }}'s Watchlist</title>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
+{% extends 'base.html' %}
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!--block默认是覆盖，写上super() 代表追加。不用block就显示父块（基模板）-->
+{% block head %}
+{{ super() }}
+{% endblock %}
+<!--以上头信息也可可以不写，效果一样-->
+
+
+{% block content %}
+<p>{{ movies|length }} Titles</p>
+<ul class="movie-list">
+    {% for movie in movies %}
+    <li>{{ movie.title }} - {{ movie.year }}
+        <span class="float-right">
+            <a class="imdb" href="https://www.imdb.com/find?q={{ movie.title }}" target="_blank" title="Find this movie on IMDb">IMDb</a>
+        </span>
+    </li>
+    {% endfor %}
+</ul>
+
+<button id="add">Add Movie</button>
+<button id="delete">Delete Movie</button>
+
+<img alt="Walking Totoro" class="totoro" src="{{ url_for('static', filename='images/totoro.gif') }}" title="to~to~ro~">
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script type="text/javascript">
     $(function() {
         $('#add').click(function() {
@@ -30,32 +50,4 @@
         })
     })
     </script>
-</head>
-<body>
-<!--所有可用过滤器-->
-<!--https://jinja.palletsprojects.com/en/2.10.x/templates/#list-of-builtin-filters-->
-   <h2>
-    <img alt="Avatar" class="avatar" src="{{ url_for('static', filename='images/avatar.png') }}">
-    {{ user }}'s Watchlist
-    </h2>
-    {# 使用 length 过滤器获取 movies 变量的长度 #}
-    <p>{{ movies|length }} Titles</p>
-    <ul class="movie-list">
-        {% for movie in movies %}  {# 迭代 movies 变量 #}
-        <li>{{ movie.title }} - {{ movie.year }}</li>  {# 等同于 movie['title'] #}
-        {% endfor %}  {# 使用 endfor 标签结束 for 语句 #}
-    </ul>
-
-
-
-
-
-<img alt="Walking Totoro" class="totoro" src="{{ url_for('static', filename='images/totoro.gif') }}">
-<br>
- <button id="add">Add Movie</button>
-<button id="delete">Delete Movie</button>
-    <footer>
-        <small>&copy; 2018 <a href="http://helloflask.com/tutorial">HelloFlask</a></small>
-    </footer>
-</body>
-</html>
+{% endblock %}
