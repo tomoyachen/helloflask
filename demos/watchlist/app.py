@@ -3,7 +3,7 @@ from faker import Faker
 from flask_sqlalchemy import SQLAlchemy
 import os, sys, click
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
 
 
@@ -23,6 +23,8 @@ app.config['SECRET_KEY'] = 'dev'  # 等同于 app.secret_key = 'dev'
 db = SQLAlchemy(app) # 初始化扩展，传入程序实例 app
 
 login_manager = LoginManager(app)  # 实例化扩展类
+login_manager.login_view = 'login' #@login_required装饰器下未登录的用户，预设的跳转页面
+login_manager.login_message = "请先登录！" #提示信息自动会以flash()形式输出
 
 @login_manager.user_loader
 def load_user(user_id):  # 创建用户加载回调函数，接受用户 ID 作为参数
@@ -51,6 +53,35 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/logout')
+@login_required  # 用于视图保护，未登录用户无法访问 与login_user()函数搭配使用，效果与current_user.is_authenticated类似
+def logout():
+    logout_user()  # 登出用户
+    flash('Goodbye.')
+    return redirect(url_for('index'))  # 重定向回首页
+
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    if request.method == 'POST':
+        name = request.form['name']
+
+        if not name or len(name) > 20:
+            flash('Invalid input.')
+            return redirect(url_for('settings'))
+
+        current_user.name = name
+        # current_user 会返回当前登录用户的数据库记录对象
+        # 等同于下面的用法
+        # user = User.query.first()
+        # user.name = name
+        db.session.commit()
+        flash('Settings updated.')
+        return redirect(url_for('index'))
+
+    return render_template('settings.html')
+
+
 @app.route('/home')
 def home():
     return '<h1>Hello Totoro!</h1><img src="http://helloflask.com/totoro.gif">'
@@ -76,6 +107,8 @@ def test_url_for():
 @app.route('/index')
 def index():
     if request.method == 'POST':  # 判断是否是 POST 请求
+        if not current_user.is_authenticated:  # 如果当前用户未认证,效果与装饰器@login_required类似
+            return redirect(url_for('index'))  # 重定向到主页
         # 获取表单数据
         title = request.form.get('title')  # 传入表单对应输入字段的 name 值
         year = request.form.get('year')
@@ -96,6 +129,7 @@ def index():
     return render_template("index.html", movies = movies) #用了context_processor装饰器，省略name
 
 @app.route('/movie/edit/<int:movie_id>', methods=['GET', 'POST'])
+@login_required  # 登录保护
 def edit(movie_id):
     movie = Movie.query.get_or_404(movie_id)
 
@@ -117,6 +151,8 @@ def edit(movie_id):
 
 
 @app.route('/movie/delete/<int:movie_id>', methods=['POST'])  # 限定只接受 POST 请求
+@login_required  # 登录保护
+
 def delete(movie_id):
     movie = Movie.query.get_or_404(movie_id)  # 获取电影记录
     db.session.delete(movie)  # 删除对应的记录
@@ -126,6 +162,7 @@ def delete(movie_id):
 
 
 @app.route("/addMovie")
+@login_required  # 用于视图保护
 def addMovie():
     movie_new = Movie(title=fake.name(), year=fake.year())
     db.session.add(movie_new)
@@ -133,6 +170,7 @@ def addMovie():
     return "0x000000"
 
 @app.route("/deleteMovie")
+@login_required  # 用于视图保护
 def deleteMovie():
     movie = Movie.query.order_by(-Movie.id).first()
     db.session.delete(movie)
