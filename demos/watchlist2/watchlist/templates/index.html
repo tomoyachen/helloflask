@@ -24,5 +24,38 @@
     </li>
     {% endfor %}
 </ul>
+
+{% if current_user.is_authenticated %}
+<button id="add">Add Movie</button>
+<button id="delete">Delete Movie</button>
+{% endif %}
+
+
 <img alt="Walking Totoro" class="totoro" src="{{ url_for('static', filename='images/totoro.gif') }}" title="to~to~ro~">
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript">
+    $(function() {
+        $('#add').click(function() {
+            $.ajax({
+                url: '/addMovie',
+                type: 'post',
+                success: function(data){
+                    window.location.reload();
+                }
+            })
+        })
+
+        $('#delete').click(function() {
+            $.ajax({
+                url: '/deleteMovie',
+                type: 'post',
+                success: function(data){
+                    window.location.reload();
+                }
+            })
+        })
+
+    })
+    </script>
 {% endblock %}

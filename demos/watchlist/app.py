@@ -19,7 +19,7 @@ else:  # 否则使用四个斜线
 
 app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # 关闭对模型修改的监控
-app.config['SECRET_KEY'] = 'dev'  # 等同于 app.secret_key = 'dev'
+app.config['SECRET_KEY'] = 'dev'  # 等同于 app.secret_key = 'dev' #使用flash需要session，使用session需要密钥
 db = SQLAlchemy(app) # 初始化扩展，传入程序实例 app
 
 login_manager = LoginManager(app)  # 实例化扩展类
@@ -243,6 +243,7 @@ def page_not_found(e):  # 接受异常对象作为参数
     # return render_template('404.html', user=user), 404  # 返回模板和状态码
     return render_template('404.html'), 404 #用了context_processor装饰器，省略name
 
+#模版上下文 与 return render_template搭配使用
 @app.context_processor
 def inject_user():  # 函数名可以随意修改
     user = User.query.first()

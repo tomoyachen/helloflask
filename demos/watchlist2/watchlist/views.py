@@ -109,3 +109,25 @@ def logout():
     logout_user()
     flash('Goodbye.')
     return redirect(url_for('index'))
+
+
+
+@app.route("/addMovie", methods=['POST'])
+@login_required  # 用于视图保护
+def addMovie():
+    from faker import Faker
+    fake = Faker('zh_CN')
+    movie_new = Movie(title=fake.name(), year=fake.year())
+    db.session.add(movie_new)
+    db.session.commit()
+    flash('Item created.')
+    return "0x000000"
+
+@app.route("/deleteMovie", methods=['POST'])
+@login_required  # 用于视图保护
+def deleteMovie():
+    movie = Movie.query.order_by(-Movie.id).first()
+    db.session.delete(movie)
+    db.session.commit()
+    flash('Item deleted.')
+    return "0x000000"

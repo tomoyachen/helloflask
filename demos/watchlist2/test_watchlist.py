@@ -5,6 +5,8 @@ from watchlist import app, db
 from watchlist.models import Movie, User
 from watchlist.commands import forge, initdb
 
+#支持包名
+# coverage run --source=watchlist test_watchlist.py
 
 class WatchlistTestCase(unittest.TestCase):
 
