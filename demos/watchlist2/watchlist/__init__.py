@@ -5,13 +5,13 @@ import sys
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 app.config.from_pyfile('settings.py')
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
-
 
 
 @login_manager.user_loader

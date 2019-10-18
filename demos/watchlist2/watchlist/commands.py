@@ -2,7 +2,7 @@
 import click
 
 from watchlist import app, db
-from watchlist.models import User, Movie
+from watchlist.models import User, Movie, Message
 
 
 @app.cli.command()
@@ -41,6 +41,7 @@ def forge():
         db.session.add(movie)
 
     db.session.commit()
+
     click.echo('Done.')
 
 

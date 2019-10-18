@@ -3,7 +3,7 @@ from flask import render_template, request, url_for, redirect, flash
 from flask_login import login_user, login_required, logout_user, current_user
 
 from watchlist import app, db
-from watchlist.models import User, Movie
+from watchlist.models import User, Movie, Message
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -131,3 +131,33 @@ def deleteMovie():
     db.session.commit()
     flash('Item deleted.')
     return "0x000000"
+
+
+@app.route('/message', methods=['GET', 'POST'])
+def message():
+    if request.method == 'POST':
+        name = request.form['name']
+        body = request.form['body']
+
+        if not name or not body:
+            flash('Invalid input.')
+            return redirect(url_for('message'))
+
+        message = Message(name=name, body=body)
+        db.session.add(message)
+        db.session.commit()
+        flash('Your message have been sent to the world!')
+        return redirect(url_for('message'))
+
+    messages = Message.query.order_by(Message.timestamp.desc()).all()
+    return render_template('message.html', messages=messages)
+
+
+@app.route('/movie/deleteMessage/<int:message_id>', methods=['POST'])
+@login_required
+def deleteMessage(message_id):
+    message = Message.query.get_or_404(message_id)
+    db.session.delete(message)
+    db.session.commit()
+    flash('Message deleted.')
+    return redirect(url_for('message'))

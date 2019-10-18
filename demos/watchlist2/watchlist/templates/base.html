@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ user.name }}'s Watchlist</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
     {% endblock %}
 </head>
 <body>
@@ -22,10 +22,11 @@
             <li><a href="{{ url_for('index') }}">Home</a></li>
             {% if current_user.is_authenticated %}
             <li><a href="{{ url_for('settings') }}">Settings</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            <li><a href="{{ url_for('logout') }}" onclick="return confirm('Are you sure?')">Logout</a></li>
             {% else %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
             {% endif %}
+            <li><a href="{{ url_for('message') }}">Message</a></li>
         </ul>
     </nav>
     {% block content %}{% endblock %}
