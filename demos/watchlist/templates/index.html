@@ -51,7 +51,7 @@
         $('#add').click(function() {
             $.ajax({
                 url: '/addMovie',
-                type: 'get',
+                type: 'post',
                 success: function(data){
                     window.location.reload();
                 }
@@ -61,23 +61,13 @@
         $('#delete').click(function() {
             $.ajax({
                 url: '/deleteMovie',
-                type: 'get',
+                type: 'post',
                 success: function(data){
                     window.location.reload();
                 }
             })
         })
 
-
-        $('#delete_movie').click(function() {
-            $.ajax({
-                url: '/deleteMovie',
-                type: 'get',
-                success: function(data){
-                    window.location.reload();
-                }
-            })
-        })
     })
     </script>
 {% endblock %}

@@ -3,6 +3,7 @@ import unittest
 from app import app, db, Movie, User, forge, initdb
 
 
+#基于unitest的单元测试
 class WatchlistTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -138,6 +139,32 @@ class WatchlistTestCase(unittest.TestCase):
         self.assertIn('Item deleted.', data)
         self.assertNotIn('Test Movie Title', data)
 
+    # 测试新增电影
+    def test_addMovie(self):
+        self.login()
+
+        # 测试创建条目操作
+        response = self.client.post('/addMovie', follow_redirects=True)
+        data = response.get_data(as_text=True)
+        self.assertIn('0x000000', data)
+        response2 = self.client.get('/')
+        data2 = response2.get_data(as_text=True)
+        self.assertIn('Item created.', data2)
+        self.assertIn('2 Titles', data2)
+
+
+    # 测试删除电影
+    def test_deleteMovie(self):
+        self.login()
+
+        # 测试创建条目操作
+        response = self.client.post('/deleteMovie', follow_redirects=True)
+        data = response.get_data(as_text=True)
+        self.assertIn('0x000000', data)
+        response2 = self.client.get('/')
+        data2 = response2.get_data(as_text=True)
+        self.assertIn('Item deleted.', data2)
+        self.assertIn('0 Titles', data2)
 
     # 测试登录保护
     def test_login_protect(self):
@@ -271,5 +298,29 @@ class WatchlistTestCase(unittest.TestCase):
         self.assertEqual(User.query.first().username, 'peter')
         self.assertTrue(User.query.first().validate_password('456'))
 
+
 if __name__ == '__main__':
+    # 全量执行
     unittest.main()
+
+
+# #安装代码覆盖率工具coverage
+# pipenv install coverage --dev
+#
+# #执行目录下所有程序文件
+# coverage run test_watchlist.py
+#
+# #检车app文件夹
+# coverage run --source=app test_watchlist.py
+#
+# #显示简略报告
+# coverage report
+# Name     Stmts   Miss  Cover
+# ----------------------------
+# app.py     146      5    97%
+#
+# #生成html报告
+# coverage html
+
+# #指定报告名字
+# coverage html -d report

@@ -161,20 +161,22 @@ def delete(movie_id):
     return redirect(url_for('index'))  # 重定向回主页
 
 
-@app.route("/addMovie")
+@app.route("/addMovie", methods=['POST'])
 @login_required  # 用于视图保护
 def addMovie():
     movie_new = Movie(title=fake.name(), year=fake.year())
     db.session.add(movie_new)
     db.session.commit()
+    flash('Item created.')
     return "0x000000"
 
-@app.route("/deleteMovie")
+@app.route("/deleteMovie", methods=['POST'])
 @login_required  # 用于视图保护
 def deleteMovie():
     movie = Movie.query.order_by(-Movie.id).first()
     db.session.delete(movie)
     db.session.commit()
+    flash('Item deleted.')
     return "0x000000"
 
 
