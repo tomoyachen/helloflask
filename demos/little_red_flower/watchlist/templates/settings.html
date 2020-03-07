@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="margin10px">
+<h3>设置</h3>
+<form method="post">
+    姓名 <input type="text" name="name" autocomplete="off" required value="{{ current_user.name }}">
+    登录名 <input type="text" name="username" autocomplete="off" required value="{{ current_user.username }}">
+    <br>    <br>
+    密码 <input type="password" name="password" autocomplete="off" placeholder="选填">
+    确认密码 <input type="password" name="validate_password" autocomplete="off" placeholder="选填">
+        <br>    <br>
+    <input class="btn" type="submit" name="submit" value="保存">
+</form>
+</div>
+{% endblock %}

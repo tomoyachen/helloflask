@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--    <title>{{ user.name }}'s Watchlist</title>-->
+    <title>星星记录册</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+    {% endblock %}
+</head>
+<body>
+    {% for message in get_flashed_messages() %}
+        <div class="alert">{{ message }}</div>
+    {% endfor %}
+    <h2 class="margin10px">
+        <img alt="Logo" class="logo" height="32px" src="{{ url_for('static', filename='images/flower.gif') }}" style="vertical-align:middle;">
+        星星记录册
+    </h2>
+
+    <nav class="daohang">
+        <ul>
+            <li><a href="{{ url_for('index') }}">首页</a></li>
+            <li><a href="{{ url_for('message') }}">留言板</a></li>
+            {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('studentinfo') }}">学生信息</a></li>
+            <li><a href="{{ url_for('log') }}">星记录</a></li>
+            <li><a href="{{ url_for('settings') }}">设置</a></li>
+            <li><a href="{{ url_for('logout') }}" onclick="return confirm('你确定要登出吗？')">登出</a></li>
+            {% else %}
+            <li><a href="{{ url_for('login') }}">登录</a></li>
+            {% endif %}
+
+        </ul>
+    </nav>
+    {% block content %}{% endblock %}
+
+    <img alt="童学馆" class="totoro" src="{{ url_for('static', filename='images/tongxueguan.gif') }}" title="to~to~ro~">
+    <footer>
+        <small>&copy; 2020 <a href="http://helloflask.com/tutorial">HelloFlask</a></small>
+	</footer>
+
+
+<style>
+    .margin10px{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+</style>
+
+
+</body>
+</html>

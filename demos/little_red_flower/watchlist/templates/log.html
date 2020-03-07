@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="margin10px">
+<h3>星记录</h3>
+
+    {% if current_user.is_authenticated %}
+
+<!--<ul class="movie-list">-->
+<!--    {% if logs|length > 0 %}-->
+
+<!--    <li>-->
+<!--    编号&emsp;-->
+<!--    姓名&emsp;&emsp;&emsp;&emsp;&emsp;-->
+<!--    类型&emsp;-->
+<!--    分值&emsp;-->
+<!--    历史星星数&emsp;&emsp;-->
+<!--    获得日期-->
+<!--     </li>-->
+<!--    {% endif%}-->
+<!--    {% for log in logs %}-->
+
+<!--    <li>#{{ log.id }}&emsp;-->
+<!--        {{ log.studentName }}-->
+<!--        {% if log.studentName|length >= 6 %}-->
+<!--        &emsp;-->
+<!--        {% elif log.studentName|length >= 5 %}-->
+<!--        &emsp;&emsp;-->
+<!--        {% elif log.studentName|length >= 4 %}-->
+<!--        &emsp;&emsp;&emsp;-->
+<!--        {% elif log.studentName|length >= 3 %}-->
+<!--        &emsp;&emsp;&emsp;&emsp;-->
+<!--        {% elif log.studentName|length >= 2 %}-->
+<!--        &emsp;&emsp;&emsp;&emsp;&emsp;-->
+<!--        {% elif log.studentName|length >= 1 %}-->
+<!--        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->
+<!--        {%  endif%}-->
+<!--        {% if log.type == 1 %}-->
+<!--        加分-->
+<!--        {% elif log.type == 2 %}-->
+<!--        减分-->
+<!--        {% endif%}&emsp;-->
+<!--        {{ log.amount }}<img alt="flower" class="flower" src="{{ url_for('static', filename='images/flower.gif') }}" title="flower" height="16px" style="vertical-align:top;">-->
+<!--        &emsp;&emsp;&emsp;-->
+<!--        {{ log.studentBalance }}<img alt="flower" class="flower" src="{{ url_for('static', filename='images/flower.gif') }}" title="flower" height="16px" style="vertical-align:top;">-->
+<!--        &emsp;&emsp;&emsp;-->
+<!--        {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}-->
+
+<!--    </li>-->
+
+<!--    {% endfor %}-->
+
+
+<!--</ul>-->
+
+
+        {% for key in logs_dict %}
+    {{key}} 上课记录
+    <ul class="movie-list">
+
+    {% if logs_dict[key] | length > 0 %}
+    <li>
+    编号&emsp;
+    姓名&emsp;&emsp;&emsp;&emsp;&emsp;
+    类型&emsp;
+    分值&emsp;
+    历史星星数&emsp;&emsp;
+    获得日期
+     </li>
+    {% endif %}
+
+    {% for log in logs_dict[key] %}
+
+    <li>#{{ log.id }}&emsp;
+        {{ log.studentName }}
+        {% if log.studentName|length >= 6 %}
+        &emsp;
+        {% elif log.studentName|length >= 5 %}
+        &emsp;&emsp;
+        {% elif log.studentName|length >= 4 %}
+        &emsp;&emsp;&emsp;
+        {% elif log.studentName|length >= 3 %}
+        &emsp;&emsp;&emsp;&emsp;
+        {% elif log.studentName|length >= 2 %}
+        &emsp;&emsp;&emsp;&emsp;&emsp;
+        {% elif log.studentName|length >= 1 %}
+        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+        {%  endif%}
+        {% if log.type == 1 %}
+        加分
+        {% elif log.type == 2 %}
+        减分
+        {% endif%}&emsp;
+
+        {% if log.amount > 0  %}
+        +{{log.amount}}
+        {% else %}
+        {{log.amount}}
+        {% endif%}&emsp;
+        &emsp;&emsp;&emsp;
+        {{ log.studentBalance }}<img alt="flower" class="flower" src="{{ url_for('static', filename='images/flower.gif') }}" title="flower" height="16px" style="vertical-align:top;">
+        &emsp;&emsp;&emsp;
+        {{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+
+    </li>
+
+    {% endfor %}
+        </ul>
+
+    {% if logs_dict[key][-1].id > 1 %}
+    <br>
+    {% endif %}
+   {% endfor%}
+    <p>{{ logs|length }} 条</p>
+
+{% endif %}
+
+</div>
+
+
+
+{% endblock %}
+
+
