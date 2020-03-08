@@ -25,21 +25,6 @@ def forge():
     db.session.add(user)
 
     #初始学生数据
-    # movies = [
-    #     {'title': '徐千寻', 'year': '', 'flower': 0},
-    #     {'title': '周君灏', 'year': '', 'flower': 0},
-    #     {'title': '万子坤', 'year': '', 'flower': 0},
-    #     {'title': '聂峻熙', 'year': '', 'flower': 0},
-    #     {'title': '龙雨薇', 'year': '', 'flower': 0},
-    #     {'title': '周诗琪', 'year': '', 'flower': 0},
-    #     {'title': '周胤辰', 'year': '', 'flower': 0},
-    #     {'title': '胡彭飞', 'year': '', 'flower': 0},
-    #     {'title': '魏文哲', 'year': '', 'flower': 0},
-    #     {'title': '胡奕成', 'year': '', 'flower': 0},
-    #     {'title': '李煊赫', 'year': '', 'flower': 0},
-    #     {'title': '马钰婷', 'year': '', 'flower': 0},
-    # ]
-
     movies = [
         {'title': '萨达', 'year': '', 'flower': 0},
         {'title': '是的撒', 'year': '', 'flower': 0},
@@ -54,6 +39,21 @@ def forge():
         {'title': '阿萨德', 'year': '', 'flower': 0},
         {'title': '啊', 'year': '', 'flower': 0},
     ]
+
+    # movies = [
+    #     {'title': '徐千寻', 'year': '', 'flower': 0},
+    #     {'title': '周君灏', 'year': '', 'flower': 0},
+    #     {'title': '万子坤', 'year': '', 'flower': 0},
+    #     {'title': '聂峻熙', 'year': '', 'flower': 0},
+    #     {'title': '龙雨薇', 'year': '', 'flower': 0},
+    #     {'title': '周诗琪', 'year': '', 'flower': 0},
+    #     {'title': '周胤辰', 'year': '', 'flower': 0},
+    #     {'title': '胡彭飞', 'year': '', 'flower': 0},
+    #     {'title': '魏文哲', 'year': '', 'flower': 0},
+    #     {'title': '胡奕成', 'year': '', 'flower': 0},
+    #     {'title': '李煊赫', 'year': '', 'flower': 0},
+    #     {'title': '马钰婷', 'year': '', 'flower': 0},
+    # ]
 
 
     for m in movies:

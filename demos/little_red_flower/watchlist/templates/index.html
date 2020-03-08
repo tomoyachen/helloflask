@@ -48,11 +48,17 @@
 
 </div>
 
+<video id="music" src="{{ url_for('static', filename='music/addFlower.mp3') }}"  loop preload="auto"></video>
+
     <script type="text/javascript">
         function show_flower(){
+            var audio= new Audio("../static/music/addFlower.mp3");
+            audio.play();
+
             var img = document.getElementById("jump_img");
             img.style.display = "inline";
             setTimeout(function() {img.style.display = "none";},3000);
+
         }
 
     </script>
