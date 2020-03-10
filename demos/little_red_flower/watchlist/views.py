@@ -3,10 +3,12 @@
 
 from flask import render_template, request, url_for, redirect, flash
 from flask_login import login_user, login_required, logout_user, current_user
+from sqlalchemy import func
 
 from watchlist import app, db
 from watchlist.models import User, Movie, Message, Log
 import time
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -28,7 +30,20 @@ def index():
         return redirect(url_for('index'))
 
     movies = Movie.query.order_by(Movie.year.asc(), Movie.id.asc()).all()
-    return render_template('index.html', movies=movies)
+
+    #瞎搞
+    import datetime
+    _start_time = datetime.datetime.now().strftime("%Y-%m-%d") + " 00:00:00"
+    _end_time = datetime.datetime.now().strftime("%Y-%m-%d") + " 23:59:59"
+    result = db.session.query( Log.studentId, func.sum(Log.amount).label('count'), ).filter(Log.timestamp >= _start_time).filter(Log.timestamp <= _end_time).group_by(Log.studentId).all()
+    # result = db.session.query( Log.studentId, func.count(1).label('count'), ).filter(db.cast(Log.timestamp, db.DATE) == db.cast(datetime.datetime.now(), db.DATE)).group_by(Log.studentId).all()
+    today_star_dict = {}
+    for item in result:
+        today_star_dict[item[0]] = item[1]
+    print(today_star_dict)
+
+
+    return render_template('index.html', movies=movies, today_star_dict=today_star_dict)
 
 
 @app.route('/movie/edit/<int:movie_id>', methods=['GET', 'POST'])
