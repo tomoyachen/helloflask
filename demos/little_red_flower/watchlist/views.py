@@ -211,7 +211,7 @@ def log():
     logs = Log.query.order_by(Log.timestamp.desc()).all()
     logs_dict = {}
     for log in logs:
-        date = log.timestamp.strftime('%Y年%m月%d日')
+        date = log.timestamp.strftime('%Y{y}%m{m}%d{d}').format(y='年', m='月', d='日')
         if date in logs_dict.keys():
             logs_dict[date].append(log)
         else:

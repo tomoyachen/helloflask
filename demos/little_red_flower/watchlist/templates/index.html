@@ -5,7 +5,7 @@
 
 <div class="margin10px">
 <h3>首页</h3>
-    <img id="jump_img" src="{{ url_for('static', filename='images/addFlower.gif') }}" style="display: none; position: absolute; z-index:2;">
+    <img id="jump_img" src="{{ url_for('static', filename='images/addFlower.gif') }}" style="display: none; position: absolute; z-index:2; ">
 
 <ul class="movie-list">
     {% for movie in movies %}
@@ -48,7 +48,6 @@
 
 </div>
 
-<video id="music" src="{{ url_for('static', filename='music/addFlower.mp3') }}"  loop preload="auto"></video>
 
     <script type="text/javascript">
         function show_flower(){
