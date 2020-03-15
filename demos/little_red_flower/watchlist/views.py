@@ -29,9 +29,9 @@ def index():
         flash('添加成功')
         return redirect(url_for('index'))
 
-    movies = Movie.query.order_by(Movie.year.asc(), Movie.id.asc()).all()
+    movies = Movie.query.order_by(Movie.teacherId.asc(), Movie.year.asc(), Movie.id.asc()).all()
     if current_user.is_authenticated and current_user.isAdmin == 0:
-        movies = Movie.query.filter_by(teacherId=current_user.id).order_by(Movie.year.asc(), Movie.id.asc()).all()
+        movies = Movie.query.filter_by(teacherId=current_user.id).order_by(Movie.teacherId.asc(), Movie.year.asc(), Movie.id.asc()).all()
 
     #瞎搞
     _start_time = datetime.datetime.now().strftime("%Y-%m-%d") + " 00:00:00"
@@ -147,11 +147,16 @@ def studentinfo():
         flash('添加成功！')
         return redirect(url_for('studentinfo'))
 
-    movies = Movie.query.order_by(Movie.year.asc(), Movie.id.asc()).all()
+    movies = Movie.query.order_by(Movie.teacherId.asc(), Movie.year.asc(), Movie.id.asc()).all()
     if current_user.isAdmin == 0:
-        movies = Movie.query.filter_by(teacherId=current_user.id).order_by(Movie.year.asc(), Movie.id.asc()).all()
+        movies = Movie.query.filter_by(teacherId=current_user.id).order_by(Movie.teacherId.asc(), Movie.year.asc(), Movie.id.asc()).all()
 
-    return render_template('studentinfo.html', movies=movies)
+    teacherlist = User.query.all()
+    teacher_dict = {}
+    for teacher in teacherlist:
+        teacher_dict[teacher.id] = teacher.name
+    print(teacher_dict)
+    return render_template('studentinfo.html', movies=movies, teacher_dict=teacher_dict)
 
 
 @app.route('/teacherinfo', methods=['GET', 'POST'])
