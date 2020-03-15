@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+<div class="margin10px">
+        <h3>老师信息</h3>
+<form method="post">
+姓名 <input type="text" name="name" autocomplete="off" required>
+登录名 <input type="text" name="username" autocomplete="off" required>
+<br>    <br>
+密码 <input type="password" name="password" autocomplete="off" required>
+确认密码 <input type="password" name="validate_password" autocomplete="off" required>
+    <br>    <br>
+<input class="btn" type="submit" name="submit" value="添加一位老师">
+</form>
+{% endif %}
+<ul class="movie-list">
+    {% for teacher in teacherlist %}
+    <li>{{ teacher.name }}
+        {{ teacher.username }}
+
+        {% if teacher.id in student_count_dict %}
+        &emsp;
+            (<span style="">{{ student_count_dict[teacher.id] }}个</span><img alt="flower" class="flower" src="{{ url_for('static', filename='images/student.gif') }}" title="flower" height="20px" style="vertical-align:middle;">)
+        {% endif %}
+
+
+        <span class="float-right">
+            {% if current_user.is_authenticated %}
+            <a class="btn" href="{{ url_for('editTeacher', teacher_id=teacher.id) }}">编辑</a>
+            <form class="inline-form" method="post" action="{{ url_for('deleteTeacher', teacher_id=teacher.id) }}">
+                <input class="btn" type="submit" name="delete" value="删除" onclick="return confirm('你确定要删除吗？')">
+            </form>
+            {% endif %}
+        </span>
+    </li>
+    {% endfor %}
+</ul>
+
+{% if current_user.is_authenticated %}
+
+<p>{{ teacherlist |length }} 条</p>
+
+{% endif %}
+
+
+    </div>
+{% endblock %}

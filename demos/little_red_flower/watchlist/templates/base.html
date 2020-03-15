@@ -17,7 +17,9 @@
     <h2 class="margin10px">
         <img alt="Logo" class="logo" height="32px" src="{{ url_for('static', filename='images/flower.gif') }}" style="vertical-align:middle;">
         星星记录册
+<!--            <span style="font-size: 20px; float:right;">{{ current_user.name }}</span>-->
     </h2>
+
 
     <nav class="daohang">
         <ul>
@@ -26,14 +28,17 @@
 <!--            <li><a href="{{ url_for('message') }}">留言板</a></li>-->
             {% if current_user.is_authenticated %}
             <li><a href="{{ url_for('studentinfo') }}">学生信息</a></li>
+                {% if current_user.isAdmin == 1 %}
+                    <li><a href="{{ url_for('teacherinfo') }}">老师信息</a></li>
+                {% endif %}
 
             <li><a href="{{ url_for('settings') }}">设置</a></li>
             <li><a href="{{ url_for('logout') }}" onclick="return confirm('你确定要登出吗？')">登出</a></li>
             {% else %}
             <li><a href="{{ url_for('login') }}">登录</a></li>
             {% endif %}
-
         </ul>
+
     </nav>
     {% block content %}{% endblock %}
 

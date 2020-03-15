@@ -7,7 +7,7 @@ from sqlalchemy import func
 
 from watchlist import app, db
 from watchlist.models import User, Movie, Message, Log
-import time
+import time, datetime
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -19,7 +19,7 @@ def index():
         title = request.form['title']
         year = request.form['year']
 
-        if not title or len(year) > 60 or len(title) > 60:
+        if not title or len(year) > 20 or len(title) > 20:
             flash('输入异常！')
             return redirect(url_for('index'))
 
@@ -30,9 +30,10 @@ def index():
         return redirect(url_for('index'))
 
     movies = Movie.query.order_by(Movie.year.asc(), Movie.id.asc()).all()
+    if current_user.is_authenticated and current_user.isAdmin == 0:
+        movies = Movie.query.filter_by(teacherId=current_user.id).order_by(Movie.year.asc(), Movie.id.asc()).all()
 
     #瞎搞
-    import datetime
     _start_time = datetime.datetime.now().strftime("%Y-%m-%d") + " 00:00:00"
     _end_time = datetime.datetime.now().strftime("%Y-%m-%d") + " 23:59:59"
     result = db.session.query( Log.studentId, func.sum(Log.amount).label('count'), ).filter(Log.timestamp >= _start_time).filter(Log.timestamp <= _end_time).group_by(Log.studentId).all()
@@ -54,18 +55,25 @@ def edit(movie_id):
     if request.method == 'POST':
         title = request.form['title']
         year = request.form['year']
+        try:
+            teacherId = request.form['teacherId']
+            movie.teacherId = teacherId
+        except:
+            pass
 
-        if not title or len(year) > 60 or len(title) > 60:
+        if not title or len(year) > 20 or len(title) > 20:
             flash('输入异常！')
             return redirect(url_for('edit', movie_id=movie_id))
 
         movie.title = title
         movie.year = year
+
         db.session.commit()
         flash('更新成功！')
         return redirect(url_for('studentinfo'))
 
-    return render_template('edit.html', movie=movie)
+    teacherlist = User.query.order_by(User.id.asc()).all()
+    return render_template('edit.html', movie=movie, teacherlist=teacherlist)
 
 
 @app.route('/movie/delete/<int:movie_id>', methods=['POST'])
@@ -82,6 +90,9 @@ def delete(movie_id):
 @login_required
 def settings():
     if request.method == 'POST':
+        if not current_user.is_authenticated:
+            return redirect(url_for('index'))
+
         name = request.form['name']
         username = request.form['username']
         password = request.form['password']
@@ -95,7 +106,7 @@ def settings():
             flash('用户名必须小于20位')
             return redirect(url_for('settings'))
 
-        user = User.query.first()
+        user = User.query.get_or_404(current_user.id)
         user.name = name
         user.username = username
 
@@ -115,25 +126,145 @@ def settings():
 
 @app.route('/studentinfo', methods=['GET', 'POST'])
 def studentinfo():
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
-        if not current_user.is_authenticated:
-            return redirect(url_for('index'))
+
 
         title = request.form['title']
         year = request.form['year']
 
-        if not title or len(year) > 60 or len(title) > 60:
+        if not title or len(year) > 20 or len(title) > 20:
             flash('输入异常！')
             return redirect(url_for('index'))
 
         movie = Movie(title=title, year=year, flower=0)
+        if current_user.isAdmin == 0:
+            movie.teacherId = current_user.id
         db.session.add(movie)
         db.session.commit()
         flash('添加成功！')
         return redirect(url_for('studentinfo'))
 
     movies = Movie.query.order_by(Movie.year.asc(), Movie.id.asc()).all()
+    if current_user.isAdmin == 0:
+        movies = Movie.query.filter_by(teacherId=current_user.id).order_by(Movie.year.asc(), Movie.id.asc()).all()
+
     return render_template('studentinfo.html', movies=movies)
+
+
+@app.route('/teacherinfo', methods=['GET', 'POST'])
+def teacherinfo():
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    if current_user.isAdmin != 1:
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+
+
+        name = request.form['name']
+        username = request.form['username']
+        password = request.form['password']
+        validate_password = request.form['validate_password']
+
+        if not name or len(name) > 20:
+            flash('姓名必须小于20位')
+            return redirect(url_for('settings'))
+
+        if not username or len(username) > 20:
+            flash('用户名必须小于20位')
+            return redirect(url_for('settings'))
+
+        if not password or len(password) > 20:
+            flash('密码必须小于20位')
+            return redirect(url_for('settings'))
+
+        if password != validate_password:
+            flash('密码不一致')
+            return redirect(url_for('settings'))
+
+        user = User(name=name, username=username)
+        user.set_password(password)
+        db.session.add(user)
+        count = db.session.commit()
+        print("count", count)
+        flash('添加成功！')
+
+        return redirect(url_for('teacherinfo'))
+
+    teacherlist = User.query.order_by(User.id.asc()).all()
+
+    #瞎搞
+    result = db.session.query(Movie.teacherId, func.count(Movie.teacherId).label('count'), ).group_by(Movie.teacherId).all()
+    student_count_dict = {}
+    for item in result:
+        student_count_dict[item[0]] = item[1]
+    print(student_count_dict)
+
+    return render_template('teacherinfo.html', teacherlist=teacherlist, student_count_dict=student_count_dict)
+
+
+
+@app.route('/movie/editTeacher/<int:teacher_id>', methods=['GET', 'POST'])
+@login_required
+def editTeacher(teacher_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    if current_user.isAdmin != 1:
+        return redirect(url_for('index'))
+
+    teacher = User.query.get_or_404(teacher_id)
+    if request.method == 'POST':
+
+        name = request.form['name']
+        username = request.form['username']
+        password = request.form['password']
+        validate_password = request.form['validate_password']
+
+        if not name or len(name) > 20:
+            flash('姓名必须小于20位')
+            return redirect(url_for('settings'))
+
+        if not username or len(username) > 20:
+            flash('用户名必须小于20位')
+            return redirect(url_for('settings'))
+
+        user = teacher
+        user.name = name
+        user.username = username
+
+        if len(password) > 0 and len(validate_password) > 0:
+            if password == validate_password:
+                user.set_password(password)
+            else:
+                flash('前后密码不一致！')
+                return redirect(url_for('settings'))
+
+        db.session.commit()
+        flash('成功更新!')
+        return redirect(url_for('teacherinfo'))
+
+    return render_template('editTeacher.html', teacher=teacher)
+
+
+@app.route('/movie/deleteTeacher/<int:teacher_id>', methods=['POST'])
+@login_required
+def deleteTeacher(teacher_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    if current_user.isAdmin != 1:
+        return redirect(url_for('index'))
+
+    user = User.query.get_or_404(teacher_id)
+    if user.isAdmin == 1:
+        flash('管理员无法被删除！')
+        return redirect(url_for('teacherinfo'))
+    db.session.delete(user)
+    db.session.commit()
+    flash('删除成功！')
+    return redirect(url_for('teacherinfo'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -146,8 +277,10 @@ def login():
             flash('输入异常！')
             return redirect(url_for('login'))
 
-        user = User.query.first()
-
+        user = User.query.filter_by(username=username).first()
+        if user == None:
+            flash('用户不存在！')
+            return redirect(url_for('login'))
         if username == user.username and user.validate_password(password):
             login_user(user)
             flash('登录成功！')
@@ -186,6 +319,8 @@ def message():
         return redirect(url_for('message'))
 
     messages = Message.query.order_by(Message.timestamp.desc()).all()
+    for message in messages:
+        message.timestamp = message.timestamp + datetime.timedelta(hours=8)
     return render_template('message.html', messages=messages)
 
 
@@ -202,8 +337,12 @@ def deleteMessage(message_id):
 @login_required
 def addFlower(student_id):
     movie = Movie.query.get_or_404(student_id)
-    movie.flower += 1;
-    db.session.commit()
+    # time.sleep(1)
+    update_count = Movie.query.filter_by(id=movie.id).filter_by(version=movie.version).update({'flower': movie.flower + 1, 'version': movie.version + 1 })
+    if update_count == 0:
+        flash('您点的太快啦！系统反应不过来了~')
+        return redirect(url_for('index'))
+
     flash('恭喜%s小朋友，获得一枚小星星~' %movie.title)
     print(movie.title, movie.flower)
     writeLog(1, student_id)
@@ -214,8 +353,15 @@ def addFlower(student_id):
 @login_required
 def removeFlower(student_id):
     movie = Movie.query.get_or_404(student_id)
-    movie.flower -= 1;
-    db.session.commit()
+    # time.sleep(1)
+    if movie.flower == 0:
+        flash('小朋友的分数不够扣了~')
+        return redirect(url_for('index'))
+    update_count = Movie.query.filter_by(id=movie.id).filter_by(version=movie.version).update({'flower': movie.flower - 1, 'version': movie.version + 1 })
+    if update_count == 0:
+        flash('您点的太快啦！系统反应不过来了~')
+        return redirect(url_for('index'))
+
     flash('%s小朋友，很遗憾失去一枚小星星~' %movie.title)
     print(movie.title, movie.flower)
     writeLog(2, student_id)
@@ -226,6 +372,12 @@ def log():
     logs = Log.query.order_by(Log.timestamp.desc()).all()
     logs_dict = {}
     for log in logs:
+        movie = Movie.query.filter_by(id=log.studentId).first()
+        log.teacherId = movie.teacherId
+        if current_user.is_authenticated and current_user.isAdmin == 0:
+            if log.teacherId != current_user.id:
+                continue
+        log.timestamp = log.timestamp + datetime.timedelta(hours=8)
         date = log.timestamp.strftime('%Y{y}%m{m}%d{d}').format(y='年', m='月', d='日')
         if date in logs_dict.keys():
             logs_dict[date].append(log)

@@ -20,9 +20,14 @@ def forge():
     """Generate fake data."""
     db.create_all()
 
-    user = User(username="teacher", name="老师")
+    user = User(name="管理员", username="admin")
     user.set_password("Aa111111")
+    user.isAdmin = 1
     db.session.add(user)
+
+    user2 = User(name="老师", username="teacher")
+    user2.set_password("Aa111111")
+    db.session.add(user2)
 
     #初始学生数据
     movies = [
@@ -40,20 +45,20 @@ def forge():
         {'title': '啊', 'year': '', 'flower': 0},
     ]
 
-    # movies = [
-    #     {'title': '徐千寻', 'year': '', 'flower': 0},
-    #     {'title': '周君灏', 'year': '', 'flower': 0},
-    #     {'title': '万子坤', 'year': '', 'flower': 0},
-    #     {'title': '聂峻熙', 'year': '', 'flower': 0},
-    #     {'title': '龙雨薇', 'year': '', 'flower': 0},
-    #     {'title': '周诗琪', 'year': '', 'flower': 0},
-    #     {'title': '周胤辰', 'year': '', 'flower': 0},
-    #     {'title': '胡彭飞', 'year': '', 'flower': 0},
-    #     {'title': '魏文哲', 'year': '', 'flower': 0},
-    #     {'title': '胡奕成', 'year': '', 'flower': 0},
-    #     {'title': '李煊赫', 'year': '', 'flower': 0},
-    #     {'title': '马钰婷', 'year': '', 'flower': 0},
-    # ]
+    movies = [
+        {'title': '徐千寻', 'year': '', 'flower': 0},
+        {'title': '周君灏', 'year': '', 'flower': 0},
+        {'title': '万子坤', 'year': '', 'flower': 0},
+        {'title': '聂峻熙', 'year': '', 'flower': 0},
+        {'title': '龙雨薇', 'year': '', 'flower': 0},
+        {'title': '周诗琪', 'year': '', 'flower': 0},
+        {'title': '周胤辰', 'year': '', 'flower': 0},
+        {'title': '胡彭飞', 'year': '', 'flower': 0},
+        {'title': '魏文哲', 'year': '', 'flower': 0},
+        {'title': '胡奕成', 'year': '', 'flower': 0},
+        {'title': '李煊赫', 'year': '', 'flower': 0},
+        {'title': '马钰婷', 'year': '', 'flower': 0},
+    ]
 
 
     for m in movies:

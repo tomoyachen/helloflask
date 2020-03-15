@@ -17,11 +17,11 @@
         <img alt="flower" class="flower" src="{{ url_for('static', filename='images/flower.gif') }}" title="flower" height="16px" style="vertical-align:top;">
 
 
-            {% if movie.id in today_star_dict %}
-            &emsp;
-             (<span style="color: red; ">{{ today_star_dict[movie.id] }}</span>
-             <img alt="flower" class="flower" src="{{ url_for('static', filename='images/flower.gif') }}" title="flower" height="16px" style="vertical-align:top;">)
-            {% endif %}
+        {% if movie.id in today_star_dict %}
+        &emsp;
+         (<span style="color: red; ">{{ today_star_dict[movie.id] }}</span>
+         <img alt="flower" class="flower" src="{{ url_for('static', filename='images/flower.gif') }}" title="flower" height="16px" style="vertical-align:top;">)
+        {% endif %}
 
 
         <span class="float-right">
