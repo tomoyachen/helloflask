@@ -29,7 +29,7 @@
         {% if current_user.is_authenticated %}
                     {% if movie.flower > 0 %}
             <form class="inline-form" method="post" action="{{ url_for('removeFlower', student_id=movie.id) }}">
-                <input id="remove_flower"class="removeFlower" type="submit" name="addFlower" value="-1" style="color: yellow;" onclick="return confirm('确定要扣掉一枚星星吗？');">
+                <input id="remove_flower"class="removeFlower" type="submit" name="removeFlower" value="-1" style="color: yellow;" onclick="return confirm('确定要扣掉一枚星星吗？');">
 
             </form>
         {% endif %}

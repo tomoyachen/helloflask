@@ -76,9 +76,13 @@ def edit(movie_id):
     return render_template('edit.html', movie=movie, teacherlist=teacherlist)
 
 
-@app.route('/movie/delete/<int:movie_id>', methods=['POST'])
+@app.route('/movie/delete/<int:movie_id>', methods=['GET', 'POST'])
 @login_required
 def delete(movie_id):
+    if request.method == 'GET':
+        flash('刚才的操作失败了，建议使用浏览器使用本系统~')
+        return redirect(url_for('studentinfo'))
+
     movie = Movie.query.get_or_404(movie_id)
     db.session.delete(movie)
     db.session.commit()
@@ -254,9 +258,13 @@ def editTeacher(teacher_id):
     return render_template('editTeacher.html', teacher=teacher)
 
 
-@app.route('/movie/deleteTeacher/<int:teacher_id>', methods=['POST'])
+@app.route('/movie/deleteTeacher/<int:teacher_id>', methods=['GET', 'POST'])
 @login_required
 def deleteTeacher(teacher_id):
+    if request.method == 'GET':
+        flash('刚才的操作失败了，建议使用浏览器使用本系统~')
+        return redirect(url_for('teacherinfo'))
+
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
     if current_user.isAdmin != 1:
@@ -329,18 +337,26 @@ def message():
     return render_template('message.html', messages=messages)
 
 
-@app.route('/movie/deleteMessage/<int:message_id>', methods=['POST'])
+@app.route('/movie/deleteMessage/<int:message_id>', methods=['GET', 'POST'])
 @login_required
 def deleteMessage(message_id):
+    if request.method == 'GET':
+        flash('刚才的操作失败了，建议使用浏览器使用本系统~')
+        return redirect(url_for('message'))
+
     message = Message.query.get_or_404(message_id)
     db.session.delete(message)
     db.session.commit()
     flash('留言已删除')
     return redirect(url_for('message'))
 
-@app.route('/student/addFlower/<int:student_id>', methods=['POST'])
+@app.route('/student/addFlower/<int:student_id>', methods=['GET', 'POST'])
 @login_required
 def addFlower(student_id):
+    if request.method == 'GET':
+        flash('刚才的操作失败了，建议使用浏览器使用本系统~')
+        return redirect(url_for('index'))
+
     movie = Movie.query.get_or_404(student_id)
     # time.sleep(1)
     update_count = Movie.query.filter_by(id=movie.id).filter_by(version=movie.version).update({'flower': movie.flower + 1, 'version': movie.version + 1 })
@@ -354,9 +370,13 @@ def addFlower(student_id):
     time.sleep(1)
     return redirect(url_for('index'))
 
-@app.route('/student/removeFlower/<int:student_id>', methods=['POST'])
+@app.route('/student/removeFlower/<int:student_id>', methods=['GET', 'POST'])
 @login_required
 def removeFlower(student_id):
+    if request.method == 'GET':
+        flash('刚才的操作失败了，建议使用浏览器使用本系统~')
+        return redirect(url_for('index'))
+
     movie = Movie.query.get_or_404(student_id)
     # time.sleep(1)
     if movie.flower == 0:
