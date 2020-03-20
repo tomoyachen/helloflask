@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" type="text/css">
+{{ super() }}
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="margin10px">
+    <h3>留言板</h3>
+    <div class="hello-form">
+       <form method="post">
+        姓名 <input type="text" name="messagename" autocomplete="off" required>
+<!--        内容 <input type="text"  name="body" autocomplete="off" required>-->
+        内容 <textarea name="messagebody" cols="20" rows="1" autocomplete="off" style="vertical-align:top;" required></textarea>
+        <input class="btn" type="submit" name="submit" value="留言">
+        </form>
+    </div>
+    <br>
+    <h5>{{ messages|length }} 条消息
+        <small class="float-right">
+            <a href="#bottom" title="Go Bottom">&darr;</a>
+        </small>
+    </h5>
+    <div class="list-group">
+        {% for message in messages %}
+
+                <a class="list-group-item list-group-item-action flex-column">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1 text-success">{{ message.name }}
+                        <small class="text-muted"> #{{ loop.revindex }}</small>
+                    </h5>
+                    <small data-toggle="tooltip" data-placement="top"
+                           data-timestamp="{{ message.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ') }}"
+                           data-delay="500">
+                        {{   message.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                    {% if current_user.is_authenticated %}
+                    <form class="inline-form" method="post" action="{{ url_for('deleteMessage', message_id=message.id) }}">
+                        <input class="btn" type="submit" name="delete" value="删除" onclick="return confirm('你确定要删除吗？')">
+                    </form>
+                    {% endif %}
+                    </small>
+                </div>
+                <p class="mb-1">{{ message.body }}</p>
+
+            </a>
+
+
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

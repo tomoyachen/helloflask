@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="margin10px">
+<h3>首页</h3>
+    <img id="jump_img" src="{{ url_for('static', filename='images/addFlower.gif') }}" style="display: none; position: absolute; z-index:2; ">
+
+<ul class="movie-list">
+    {% for movie in movies %}
+    <li>{{ movie.title }}
+        {% if movie.year %}
+        ({{ movie.year }})
+        {% endif %}
+        - <span style="color: red; ">{{movie.flower}}</span>
+        <img alt="flower" class="flower" src="{{ url_for('static', filename='images/flower.gif') }}" title="flower" height="16px" style="vertical-align:top;">
+
+
+        {% if movie.id in today_star_dict %}
+        &emsp;
+         (<span style="color: red; ">{{ today_star_dict[movie.id] }}</span>
+         <img alt="flower" class="flower" src="{{ url_for('static', filename='images/flower.gif') }}" title="flower" height="16px" style="vertical-align:top;">)
+        {% endif %}
+
+
+        <span class="float-right">
+
+        {% if current_user.is_authenticated %}
+                    {% if movie.flower > 0 %}
+            <form class="inline-form" method="post" action="{{ url_for('removeFlower', student_id=movie.id) }}">
+                <input id="remove_flower"class="removeFlower" type="submit" name="removeFlower" value="-1" style="color: yellow;" onclick="return confirm('确定要扣掉一枚星星吗？');">
+
+            </form>
+        {% endif %}
+        <form class="inline-form" method="post" action="{{ url_for('addFlower', student_id=movie.id) }}">
+<!--                <input id="add_flower"class="imdb" type="submit" name="addFlower" value="奖励一枚星星!" onclick="return confirm('确定吗？'); ab(); ">-->
+            <input id="add_flower"class="addFlower" type="submit" name="addFlower" value="奖励一枚星星!" onclick="show_flower();">
+
+        </form>
+
+            {% endif %}
+        </span>
+
+    </li>
+    {% endfor %}
+</ul>
+
+{% if current_user.is_authenticated %}
+
+<p>{{ movies|length }} 条</p>
+
+{% endif %}
+
+</div>
+
+
+    <script type="text/javascript">
+        function show_flower(){
+            var audio= new Audio("../static/music/addFlower.mp3");
+            audio.play();
+
+            var img = document.getElementById("jump_img");
+            img.style.display = "inline";
+            setTimeout(function() {img.style.display = "none";},3000);
+
+        }
+
+    </script>
+
+
+{% endblock %}
+
+

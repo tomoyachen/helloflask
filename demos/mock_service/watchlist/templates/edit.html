@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="margin10px">
+<h3>编辑信息</h3>
+
+<form method="post">
+    姓名 <input type="text" name="title" autocomplete="off" required value="{{ movie.title }}">
+    小组 <input type="text" name="year" autocomplete="off"  value="{{ movie.year }}" placeholder="选填">
+    {% if current_user.isAdmin == 1 %}
+        所属老师 <select name="teacherId" value="{{ movie.teacherId }}" required>
+        {% for teacher in teacherlist %}
+                {% if teacher.id == movie.teacherId %}
+                 <option value="{{teacher.id}}" selected="selected" >{{teacher.name}}</option>
+                {% else %}
+                <option value="{{teacher.id}}" >{{teacher.name}}</option>
+                {% endif %}
+        {% endfor %}
+    </select>
+    {% endif %}
+    <input class="btn" type="submit" name="submit" value="更新">
+</form>
+
+</div>
+{% endblock %}
