@@ -38,7 +38,7 @@ def forge():
 
 
     for api in api_list:
-        movie = Api(name=api['name'], path=api['path'],  response=api['path'])
+        movie = Api(name=api['name'], path=api['path'],  response=api['response'])
         db.session.add(movie)
 
     db.session.commit()
